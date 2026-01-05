@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ca">
+<head>
+  <meta charset="utf-8">
+  <title>Ingredients · Masgrau</title>
+</head>
+<body>
+
+<h1>Ingredients</h1>
+
+<table border="1" cellpadding="6">
+  <tr>
+    <th>Codi</th>
+    <th>Ingredient</th>
+    <th>Proveïdor</th>
+    <th>kcal / 100 g</th>
+    <th>kJ / 100 g</th>
+  </tr>
+
+  {% for it in ingredients %}
+  <tr>
+    <td>{{ it["codi"] }}</td>
+    <td>{{ it["ingredient"] }}</td>
+    <td>{{ it["proveidor"] or "" }}</td>
+    <td>{{ it["energia_kcal_100g"] if it["energia_kcal_100g"] is not none else "" }}</td>
+    <td>{{ it["energia_kj_100g"] if it["energia_kj_100g"] is not none else "" }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+</body>
+</html>

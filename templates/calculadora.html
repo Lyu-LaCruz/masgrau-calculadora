@@ -1,0 +1,137 @@
+<!-- templates/calculadora.html -->
+<!doctype html>
+<html lang="ca">
+<head>
+  <meta charset="utf-8">
+  <title>Calculadora · Masgrau</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+<h1>Calculadora</h1>
+
+<form action="{{ url_for('descarregar_qr') }}" method="get">
+  <button type="submit">📱 Descarregar QR</button>
+</form>
+
+
+{% if missatge %}
+  <p style="border:1px solid #999; padding:8px; display:inline-block;">
+    <b>{{ missatge }}</b>
+  </p>
+{% endif %}
+
+<h2>Afegir ingredient</h2>
+
+<form method="post" action="{{ url_for('calculadora') }}">
+  <p>Ingredient:</p>
+  <select name="codi" required>
+    {% for it in ingredients %}
+      <option value="{{ it['codi'] }}">{{ it['ingredient'] }} ({{ it['codi'] }})</option>
+    {% endfor %}
+  </select>
+
+  <p>Quantitat:</p>
+  <input type="number" name="quantitat" step="0.01" min="0" required>
+  <select name="unitat">
+    <option value="g">g</option>
+    <option value="kg">kg</option>
+  </select>
+
+  <p>Ració (g) (opcional):</p>
+  <input type="number" name="racio_g" step="0.01" min="0" value="{{ racio_g }}">
+
+  <p>
+    <button type="submit">Afegir</button>
+  </p>
+</form>
+
+<form method="post" action="{{ url_for('netejar_calculadora') }}">
+  <button type="submit">Netejar</button>
+</form>
+
+<hr>
+
+{% if linies and linies|length > 0 %}
+
+  <h2>Ingredients afegits</h2>
+
+  <table border="1" cellpadding="6">
+    <tr>
+      <th>#</th>
+      <th>Ingredient</th>
+      <th>Grams</th>
+      <th>Acció</th>
+    </tr>
+    {% for l in linies %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ l['ingredient'] }} ({{ l['codi'] }})</td>
+      <td>{{ l['grams'] }}</td>
+      <td>
+        <form method="post" action="{{ url_for('eliminar_linia', index=loop.index0) }}" style="display:inline;">
+          <button type="submit">🗑️ Eliminar</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <hr>
+
+  <h2>Guardar recepta</h2>
+
+  <!-- 1 sol form, 2 botons amb formaction -->
+  <form method="post">
+    <label>Nom de la recepta:</label><br>
+    <input type="text" name="nom_recepta" placeholder="Ex: Pastís de formatge" required>
+
+    <button type="submit" formaction="{{ url_for('descarregar_pdf_recepta') }}">
+      📄 Descarregar PDF
+    </button>
+
+    <button type="submit" formaction="{{ url_for('guardar_recepta_post') }}">
+      💾 Guardar recepta
+    </button>
+  </form>
+
+{% else %}
+  <p><i>Encara no has afegit cap ingredient.</i></p>
+{% endif %}
+
+<hr>
+
+{% if resultat %}
+  <h2>Valor nutricional per 100 g de recepta</h2>
+
+  <p><b>Pes total recepta:</b> {{ resultat.pes_total_g }} g</p>
+
+  <table border="1" cellpadding="6">
+    <tr><th>Energia</th><td>{{ resultat.energia_kcal_100g }} kcal / {{ resultat.energia_kj_100g }} kJ</td></tr>
+    <tr><th>Greixos</th><td>{{ resultat.greixos_100g }} g</td></tr>
+    <tr><th>Greixos saturats</th><td>{{ resultat.greixos_saturats_100g }} g</td></tr>
+    <tr><th>Hidrats de carboni</th><td>{{ resultat.hidrats_carboni_100g }} g</td></tr>
+    <tr><th>Sucres</th><td>{{ resultat.sucres_100g }} g</td></tr>
+    <tr><th>Proteïnes</th><td>{{ resultat.proteines_100g }} g</td></tr>
+    <tr><th>Fibra</th><td>{{ resultat.fibra_100g }} g</td></tr>
+    <tr><th>Sal</th><td>{{ resultat.sal_100g }} g</td></tr>
+  </table>
+{% endif %}
+
+{% if resultat_racio %}
+  <h2>Valor nutricional per ració ({{ resultat_racio.racio_g }} g)</h2>
+
+  <table border="1" cellpadding="6">
+    <tr><th>Energia</th><td>{{ resultat_racio.energia_kcal }} kcal / {{ resultat_racio.energia_kj }} kJ</td></tr>
+    <tr><th>Greixos</th><td>{{ resultat_racio.greixos }} g</td></tr>
+    <tr><th>Greixos saturats</th><td>{{ resultat_racio.greixos_saturats }} g</td></tr>
+    <tr><th>Hidrats de carboni</th><td>{{ resultat_racio.hidrats_carboni }} g</td></tr>
+    <tr><th>Sucres</th><td>{{ resultat_racio.sucres }} g</td></tr>
+    <tr><th>Proteïnes</th><td>{{ resultat_racio.proteines }} g</td></tr>
+    <tr><th>Fibra</th><td>{{ resultat_racio.fibra }} g</td></tr>
+    <tr><th>Sal</th><td>{{ resultat_racio.sal }} g</td></tr>
+  </table>
+{% endif %}
+
+</body>
+</html>
