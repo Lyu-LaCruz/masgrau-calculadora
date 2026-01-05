@@ -1,4 +1,5 @@
 # app.py
+import os
 import qrcode
 import sqlite3
 from pathlib import Path
@@ -522,4 +523,6 @@ def guardar_recepta_post():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
+
